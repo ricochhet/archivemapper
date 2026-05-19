@@ -1,0 +1,10 @@
+build
+.test
+target
+*.exe
+*.obj
+*.bin
+*.o
+.releases
+*.syso
+*.log

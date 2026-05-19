@@ -1,0 +1,26 @@
+[
+	{
+		"label": "Run Format",
+		"command": "make fmt",
+		"cwd": "$ZED_WORKTREE_ROOT",
+		"reveal": "always",
+	},
+	{
+		"label": "Run Lint",
+		"command": "make lint",
+		"cwd": "$ZED_WORKTREE_ROOT",
+		"reveal": "always",
+	},
+	{
+		"label": "Run Tidy",
+		"command": "make tidy",
+		"cwd": "$ZED_WORKTREE_ROOT",
+		"reveal": "always",
+	},
+	{
+		"label": "Build (Windows)",
+		"command": "make build-windows",
+		"cwd": "$ZED_WORKTREE_ROOT",
+		"reveal": "always",
+	},
+]
