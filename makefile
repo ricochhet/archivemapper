@@ -3,7 +3,7 @@ CUSTOM=-X 'main.buildDate=$(shell date)' -X 'main.gitHash=$(shell git rev-parse 
 LDFLAGS=$(CUSTOM) -w -s -extldflags=-static
 GO_BUILD=go build -trimpath -ldflags "$(LDFLAGS)"
 
-APP_PATH=./src
+APP_PATH=.
 APP_NAME=archivemapper
 
 define GO_BUILD_CMD

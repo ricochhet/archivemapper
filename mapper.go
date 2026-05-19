@@ -50,7 +50,7 @@ type CompareOptions struct {
 	PathDepth int
 }
 
-func compare(src SourceFiles, dst DestinationFiles, opts CompareOptions) Output {
+func compare(src SourceFiles, dst DestinationFiles, opts *CompareOptions) *Output {
 	result := Output{
 		Matches: MappedFiles{},
 		Stray:   MappedFiles{},
@@ -117,10 +117,10 @@ func compare(src SourceFiles, dst DestinationFiles, opts CompareOptions) Output 
 		}
 	}
 
-	return result
+	return &result
 }
 
-func writeJSON(src SourceFiles, dst DestinationFiles, path string, opts CompareOptions) error {
+func writeJSON(src SourceFiles, dst DestinationFiles, path string, opts *CompareOptions) error {
 	result := compare(src, dst, opts)
 
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
@@ -150,7 +150,7 @@ func pathTail(path string, depth int) string {
 	return strings.Join(parts[len(parts)-depth:], "/")
 }
 
-func walkSource(root string, formats []string) (SourceFiles, error) {
+func walkSource(root string, formats []string) (*SourceFiles, error) {
 	result := SourceFiles{}
 
 	err := filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
@@ -171,15 +171,15 @@ func walkSource(root string, formats []string) (SourceFiles, error) {
 			return err
 		}
 
-		maps.Copy(result, files)
+		maps.Copy(result, *files)
 
 		return nil
 	})
 
-	return result, err
+	return &result, err
 }
 
-func walkDestination(root string) (DestinationFiles, error) {
+func walkDestination(root string) (*DestinationFiles, error) {
 	result := DestinationFiles{}
 
 	err := filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
@@ -208,10 +208,10 @@ func walkDestination(root string) (DestinationFiles, error) {
 		return nil
 	})
 
-	return result, err
+	return &result, err
 }
 
-func readArchive(path string) (SourceFiles, error) {
+func readArchive(path string) (*SourceFiles, error) {
 	result := SourceFiles{}
 
 	a, err := unarr.NewArchive(path)
@@ -245,5 +245,5 @@ func readArchive(path string) (SourceFiles, error) {
 		}
 	}
 
-	return result, nil
+	return &result, nil
 }

@@ -63,7 +63,7 @@ func main() {
 		log.Fatalf("failed to walk destination directory: %v\n", err)
 	}
 
-	if err := writeJSON(s, d, *output, CompareOptions{
+	if err := writeJSON(*s, *d, *output, &CompareOptions{
 		MatchHash: *matchHash,
 		MatchPath: *matchPath,
 		PathDepth: *pathDepth,
