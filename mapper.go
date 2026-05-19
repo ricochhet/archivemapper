@@ -94,11 +94,10 @@ func compare(src SourceFiles, dst DestinationFiles, opts CompareOptions) Output 
 			if candidates, ok := dstByTail[tail]; ok && len(candidates) > 0 {
 				dstHash := candidates[0]
 				d := dst[dstHash]
-				sc, dc := s, d
 
 				fmt.Printf("Found path match (%s): %s (%s) ~~ %s \n", tail, s.Name, s.Path, d.Path)
 
-				result.Matches[hash] = MappedFile{Src: &sc, Dst: &dc}
+				result.Matches[hash] = MappedFile{Src: &s, Dst: &d}
 				matchedSrc[hash] = true
 				matchedDst[dstHash] = true
 				dstByTail[tail] = candidates[1:]
@@ -108,15 +107,13 @@ func compare(src SourceFiles, dst DestinationFiles, opts CompareOptions) Output 
 
 	for hash, s := range src {
 		if !matchedSrc[hash] {
-			sc := s
-			result.Stray[hash] = MappedFile{Src: &sc}
+			result.Stray[hash] = MappedFile{Src: &s}
 		}
 	}
 
 	for hash, d := range dst {
 		if !matchedDst[hash] {
-			dc := d
-			result.Stray[hash] = MappedFile{Dst: &dc}
+			result.Stray[hash] = MappedFile{Dst: &d}
 		}
 	}
 
@@ -124,14 +121,13 @@ func compare(src SourceFiles, dst DestinationFiles, opts CompareOptions) Output 
 }
 
 func writeJSON(src SourceFiles, dst DestinationFiles, path string, opts CompareOptions) error {
-	c := compare(src, dst, opts)
+	result := compare(src, dst, opts)
 
-	err := os.MkdirAll(filepath.Dir(path), 0o755)
-	if err != nil {
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return err
 	}
 
-	data, err := json.MarshalIndent(c, "", "\t")
+	data, err := json.MarshalIndent(result, "", "\t")
 	if err != nil {
 		return err
 	}
@@ -170,12 +166,12 @@ func walkSource(root string, formats []string) (SourceFiles, error) {
 			return nil
 		}
 
-		f, err := readArchive(path)
+		files, err := readArchive(path)
 		if err != nil {
 			return err
 		}
 
-		maps.Copy(result, f)
+		maps.Copy(result, files)
 
 		return nil
 	})
@@ -216,7 +212,7 @@ func walkDestination(root string) (DestinationFiles, error) {
 }
 
 func readArchive(path string) (SourceFiles, error) {
-	files := SourceFiles{}
+	result := SourceFiles{}
 
 	a, err := unarr.NewArchive(path)
 	if err != nil {
@@ -225,8 +221,7 @@ func readArchive(path string) (SourceFiles, error) {
 	defer a.Close()
 
 	for {
-		err := a.Entry()
-		if err != nil {
+		if err := a.Entry(); err != nil {
 			if errors.Is(err, io.EOF) {
 				break
 			}
@@ -243,12 +238,12 @@ func readArchive(path string) (SourceFiles, error) {
 
 		h := md5.New()
 		h.Write(data)
-		files[hex.EncodeToString(h.Sum(nil))] = SourceFile{
+		result[hex.EncodeToString(h.Sum(nil))] = SourceFile{
 			Path: path,
 			Name: a.Name(),
 			Size: a.Size(),
 		}
 	}
 
-	return files, nil
+	return result, nil
 }
