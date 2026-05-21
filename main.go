@@ -17,9 +17,9 @@ var (
 )
 
 func version() {
-	log.Printf("%s-%s\n", name, gitHash)
-	log.Printf("Build date: %s\n", buildDate)
-	log.Printf("Build on: %s\n", buildOn)
+	fmt.Printf("%s-%s\n", name, gitHash)
+	fmt.Printf("Build date: %s\n", buildDate)
+	fmt.Printf("Build on: %s\n", buildOn)
 	os.Exit(0)
 }
 
